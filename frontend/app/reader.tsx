@@ -20,6 +20,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HighlightColor, useApp } from '@/src/context/AppContext';
+import { AdBanner } from '@/src/ads/AdBanner';
+import { preloadInterstitial, showInterstitialIfReady } from '@/src/ads/interstitial';
 import {
   TRANSLATIONS,
   Translation,
@@ -89,6 +91,10 @@ export default function Reader() {
   }, [loc.book, loc.chapter, recordVisit]);
 
   useEffect(() => {
+    preloadInterstitial();
+  }, []);
+
+  useEffect(() => {
     if (flashVerse == null) return;
     const t = setTimeout(() => setFlashVerse(null), 1800);
     return () => clearTimeout(t);
@@ -103,6 +109,11 @@ export default function Reader() {
     setFlashVerse(null);
     setLoc(next);
     scrollRef.current?.scrollTo({ y: 0, animated: false });
+    // Show an interstitial at a natural break — every 3rd chapter change.
+    chapterChanges.current += 1;
+    if (chapterChanges.current % 3 === 0) {
+      showInterstitialIfReady();
+    }
   };
 
   const onVerseLayout = (v: number, y: number) => {
@@ -229,31 +240,39 @@ export default function Reader() {
         }}
         testID="reader-scroll"
       >
-        {verses.map((item) => {
+        {verses.map((item, idx) => {
           const hc = highlights[`${loc.book}|${loc.chapter}|${item.v}`];
           const flash = flashVerse === item.v;
+          // Intersperse a banner between paragraphs — spaced out, not congested.
+          const showBanner = idx > 0 && idx % 14 === 0 && idx !== verses.length - 1;
           return (
-            <Pressable
+            <View
               key={item.v}
-              testID={`verse-${item.v}`}
-              onPress={() => openVerse(item.v, item.text)}
               onLayout={(e) => onVerseLayout(item.v, e.nativeEvent.layout.y)}
-              style={[
-                styles.verseRow,
-                flash && { backgroundColor: colors.surfaceSecondary },
-              ]}
             >
-              <Text
+              {showBanner ? (
+                <AdBanner style={{ marginVertical: spacing.lg }} />
+              ) : null}
+              <Pressable
+                testID={`verse-${item.v}`}
+                onPress={() => openVerse(item.v, item.text)}
                 style={[
-                  styles.verseText,
-                  { fontSize: vFontSize, lineHeight: vLineHeight },
-                  hc ? { backgroundColor: colors[highlightKey(hc)] } : null,
+                  styles.verseRow,
+                  flash && { backgroundColor: colors.surfaceSecondary },
                 ]}
               >
-                <Text style={styles.verseNum}>{item.v} </Text>
-                {item.text}
-              </Text>
-            </Pressable>
+                <Text
+                  style={[
+                    styles.verseText,
+                    { fontSize: vFontSize, lineHeight: vLineHeight },
+                    hc ? { backgroundColor: colors[highlightKey(hc)] } : null,
+                  ]}
+                >
+                  <Text style={styles.verseNum}>{item.v} </Text>
+                  {item.text}
+                </Text>
+              </Pressable>
+            </View>
           );
         })}
 

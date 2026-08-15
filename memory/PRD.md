@@ -47,7 +47,19 @@ Build a minimal, offline-first Bible reading app. No backend, no database, no au
 - Testing agent: iteration 2 — all 4 new features + nav change pass 100%.
 
 
-## Backlog (prioritized)
+## Implemented — v3: Google AdMob (2026-06-15)
+- Integrated `react-native-google-mobile-ads` (+ `expo-tracking-transparency`, `expo-dev-client`, `expo-build-properties`) via the official Emergent integration playbook.
+- **Banner + Interstitial**. Banner on Home (bottom) and interspersed in the reader every ~14 verses (spaced, not congested). Interstitial shown at a natural break — every 3rd chapter change in the reader.
+- App ID `ca-app-pub-1245254576744368~9090518340`; banner unit `/5586387605`; interstitial unit `/4049944656` (set in `app.json` plugin + ad components). Google **TestIds** used automatically in `__DEV__`; real IDs only in release builds.
+- Ads are isolated in `src/ads/` with base (native) + `.web` no-op variants and an Expo-Go guard, so web preview and Expo Go keep working (ads render nothing there).
+- ⚠️ AdMob requires a **development/production build** — ads (even test ads) do NOT appear in Expo Go or the web preview. Verified the app bundles and all existing flows still work (auto-scroll, reader, Home, Learn) with ads no-op on web.
+
+## Files (ads)
+- `src/ads/initializeAds.ts` / `.web.ts` — SDK init + iOS ATT, called from `app/_layout.tsx`.
+- `src/ads/AdBanner.tsx` / `.web.tsx` — banner component.
+- `src/ads/interstitial.ts` / `.web.ts` — preload/show helpers.
+
+
 - **P2**: Reading plans / daily plan; per-book completion list; audio reading; more translations (ASV/BBE from same repo).
 - **P2**: Bookmark folders/notes; export bookmarks; share verse card styling themes; link cross-references in dictionary entries.
 

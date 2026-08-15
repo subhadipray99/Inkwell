@@ -17,6 +17,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/src/context/AppContext';
+import { AdBanner } from '@/src/ads/AdBanner';
 import { TOTAL_CHAPTERS } from '@/src/lib/bible';
 import { parseReference } from '@/src/lib/reference';
 import { storage } from '@/src/utils/storage';
@@ -285,6 +286,8 @@ export default function Home() {
         </View>
         <Feather name="arrow-right" size={20} color={colors.onSurfaceTertiary} />
       </Pressable>
+
+      <AdBanner style={{ marginTop: spacing.xl }} />
     </ScrollView>
   );
 }
