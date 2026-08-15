@@ -1,0 +1,197 @@
+{
+  "app_name": "Logos (Bible Reader)",
+  "personality": "3 Editorial Mobile LIGHT",
+  "personality_one_liner": "A calm, typography-first sanctuary for reading, using generous whitespace and classic serif fonts to elevate the scripture.",
+  "color": {
+    "light": {
+      "surface": "#FDFBF7",
+      "onSurface": "#2B2A28",
+      "surfaceSecondary": "#F5F2EB",
+      "onSurfaceSecondary": "#4A4844",
+      "surfaceTertiary": "#EBE6DA",
+      "onSurfaceTertiary": "#5C5A55",
+      "surfaceInverse": "#2B2A28",
+      "onSurfaceInverse": "#FDFBF7",
+      "brand": "#A86349",
+      "brandPrimary": "#A86349",
+      "onBrandPrimary": "#FDFBF7",
+      "brandSecondary": "#C28A75",
+      "onBrandSecondary": "#2B2A28",
+      "brandTertiary": "#E8D5CD",
+      "onBrandTertiary": "#613524",
+      "success": "#3A6B4E",
+      "onSuccess": "#FFFFFF",
+      "warning": "#C7822A",
+      "onWarning": "#FFFFFF",
+      "error": "#9E3C3C",
+      "onError": "#FFFFFF",
+      "info": "#4A5A70",
+      "onInfo": "#FFFFFF",
+      "border": "#EBE6DA",
+      "borderStrong": "#D6CFC1",
+      "divider": "#EBE6DA",
+      "highlightYellow": "#FCE4A1",
+      "highlightRed": "#F2C9CB",
+      "highlightGreen": "#C8E0D2"
+    },
+    "dark": {
+      "surface": "#1C1B1A",
+      "onSurface": "#EBE6DA",
+      "surfaceSecondary": "#262523",
+      "onSurfaceSecondary": "#C4C0B5",
+      "surfaceTertiary": "#33312E",
+      "onSurfaceTertiary": "#A19C91",
+      "surfaceInverse": "#FDFBF7",
+      "onSurfaceInverse": "#1C1B1A",
+      "brand": "#C28A75",
+      "brandPrimary": "#C28A75",
+      "onBrandPrimary": "#1C1B1A",
+      "brandSecondary": "#A86349",
+      "onBrandSecondary": "#FDFBF7",
+      "brandTertiary": "#4A3127",
+      "onBrandTertiary": "#E8D5CD",
+      "success": "#63A67E",
+      "onSuccess": "#1C1B1A",
+      "warning": "#E8AC5A",
+      "onWarning": "#1C1B1A",
+      "error": "#D96C6C",
+      "onError": "#1C1B1A",
+      "info": "#7B90AD",
+      "onInfo": "#1C1B1A",
+      "border": "#33312E",
+      "borderStrong": "#4A4844",
+      "divider": "#33312E",
+      "highlightYellow": "#806B29",
+      "highlightRed": "#7A3B3F",
+      "highlightGreen": "#385E48"
+    }
+  },
+  "typography": {
+    "displayFontFamily": "Lora",
+    "textFontFamily": "DMSans",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24,
+      "3xl": 32
+    }
+  },
+  "spacing": {
+    "rule": "Generous vertical breathing room. Treat the interface like a printed book. No cramped cards or tight lists.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 4,
+    "md": 8,
+    "lg": 12,
+    "pill": 999
+  },
+  "shadow_tier": "0",
+  "navigation": "bottom_tabs",
+  "icon_set": "Feather",
+  "glassmorphism": {
+    "enabled": false,
+    "do's": [],
+    "dont's": [
+      "No glassmorphism. This is an Editorial app; rely on flat colors, stark contrast, and matte paper-like textures."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "none",
+      "android": "none",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "none",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Home",
+      "purpose": "A serene dashboard highlighting the Verse of the Day, reading progress, and quick access to continue reading.",
+      "states": {
+        "loading": "Centered minimalist spinner.",
+        "empty": "N/A",
+        "error": "Failed to load cached Verse of the Day, showing an offline fallback verse."
+      },
+      "layout": "Top half is a hero card (Verse of the Day) with a full-bleed calm background image, layered with a vertical gradient scrim, and elegant Lora typography. Below the hero: 'Continue Reading' card spanning full width, and a 2-column grid for 'Progress' and 'Streak' metrics."
+    },
+    {
+      "name": "Read (Library & Reader)",
+      "purpose": "The core scripture reading experience, allowing navigation from Book -> Chapter -> Verse.",
+      "states": {
+        "loading": "Skeleton text lines.",
+        "empty": "N/A",
+        "error": "Error loading local text bundle."
+      },
+      "layout": "Library: A clean list of books, heavily reliant on whitespace and subtle dividers. Chapter Grid: Simple numeric tiles. Reader View: Edge-to-edge text using Lora font, justified or left-aligned depending on size, generous line height (1.6+). Header hides on scroll. A floating 'Settings/Translation' pill at the bottom."
+    },
+    {
+      "name": "Search",
+      "purpose": "Client-side search across offline scripture.",
+      "states": {
+        "loading": "Subtle loading text.",
+        "empty": "Illustration of an open book with prompt to search keywords.",
+        "error": "No results found message."
+      },
+      "layout": "Prominent search input (flat, borderStrong bottom border only, no rounded box) at the top. Results are presented as a flat list with the Book/Chapter/Verse in DMSans (UI font) and the verse excerpt in Lora (Serif)."
+    },
+    {
+      "name": "Bookmarks",
+      "purpose": "List of saved verses and highlighted passages.",
+      "states": {
+        "loading": "Spinner.",
+        "empty": "Illustration of a bookmark and 'No verses saved yet.' message.",
+        "error": "Failed to read localStorage."
+      },
+      "layout": "Standard single-column editorial list. Each item shows the verse text prominently in Lora, with metadata (Book Chapter:Verse) in smaller DMSans above it. Swipe to delete."
+    },
+    {
+      "name": "Progress",
+      "purpose": "Visual representation of reading completion and streaks.",
+      "states": {
+        "loading": "Spinner.",
+        "empty": "N/A",
+        "error": "N/A"
+      },
+      "layout": "Editorial presentation of data. Large typography for percentages and streak days instead of generic progress bars. Use whitespace and typography to group 'Chapters Visited' and 'Daily Streak'."
+    }
+  ],
+  "images": {
+    "hero_verse_of_the_day": {
+      "url": "https://images.unsplash.com/photo-1603484477859-abe6a73f9366?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxjYWxtJTIwbW9ybmluZyUyMGxpZ2h0JTIwYWJzdHJhY3QlMjBwYXBlciUyMHRleHR1cmV8ZW58MHx8fHwxNzg2ODAwMDg2fDA&ixlib=rb-4.1.0&q=85",
+      "dark": "https://images.unsplash.com/photo-1513628253939-010e64ac66cd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwxfHxtb29keSUyMGRhcmslMjBuaWdodCUyMHNreSUyMHN1YnRsZSUyMHRleHR1cmV8ZW58MHx8fHwxNzg2ODAwMDg2fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract textured background for Verse of the Day"
+    },
+    "empty_search": {
+      "url": "https://images.unsplash.com/photo-1476275466078-4007374efbbe?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwb3BlbiUyMGJvb2slMjB0b3AlMjBkb3dufGVufDB8fHx8MTc4NjgwMDA5NXww&ixlib=rb-4.1.0&q=85",
+      "alt": "Minimalist open book top down"
+    }
+  },
+  "haptics": {
+    "tab_press": "light",
+    "bookmark_save": "medium",
+    "translation_switch": "light",
+    "verse_highlight": "success"
+  },
+  "instructions_to_main_agent": [
+    "ADHERE STRICTLY TO THE EDITORIAL LIGHT PERSONALITY: Rely entirely on flat surfaces, generous whitespace (xl/2xl), and elegant typography. Do not introduce shadows or glassmorphism.",
+    "BANNED COLORS: Strictly avoid any blues, indigos, purples, or typical 'tech' palettes. Use the provided warm cream/off-white (light mode) and soft dark-gray (dark mode) as surfaces, and muted rust/terracotta for brand accents.",
+    "TYPOGRAPHY HIERARCHY: Use Lora (Display/Serif) exclusively for scripture, verse text, and major headings. Use DMSans (Text/Sans) for UI elements, tabs, metadata, settings, and buttons. Do not exceed font-weight 500.",
+    "VERSE HIGHLIGHTING UX: When a user taps or long-presses a verse, avoid default system selection handles if possible (as they are clunky). Instead, wrap verses in Pressables and trigger a custom BottomSheet (via @gorhom/bottom-sheet) to select highlight colors (Yellow, Red, Green) or Copy to Clipboard.",
+    "IMAGE SCRIM MANDATE: For the Verse of the Day card on the Home screen, layer a 3-stop vertical gradient scrim (transparent -> 20% surfaceInverse -> 70% surfaceInverse) between the image and the text to ensure the Lora text is perfectly legible.",
+    "LOCAL STORAGE ARCHITECTURE: All states (bookmarks, highlights, progress, dark mode preference) must be strictly persisted using AsyncStorage or a local SQLite/WatermelonDB equivalent if the text bundle is large. Do not set up a remote backend.",
+    "OFFLINE TRANSLATIONS: Ensure the UI provides a seamless, instant toggle between the offline bundled KJV and WEB texts, preferably via a subtle floating action pill or a top right header icon."
+  ]
+}

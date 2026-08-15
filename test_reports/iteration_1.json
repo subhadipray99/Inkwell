@@ -1,0 +1,25 @@
+{
+  "summary": "First testing iteration for the Logos offline-first Bible reading app (client-only Expo Router web preview). All 14 requested user flows were exercised end-to-end via Playwright on a 390x844 mobile viewport. Everything works: Home renders VOTD (live from bible-api.com/data/web/random, e.g. '1 Kings 14:7'), bottom tabs (Home/Read/Search/Saved/Progress) present and navigable, theme toggle switches to dark (home-scroll bg -> rgb(28,27,26)) AND persists across a full reload with no wrong-theme flash, Read tab OT/NT segmented control filters books, book-row-* navigates to chapters, chapter-tile-* opens reader, deep-link /reader?book=John&chapter=3&verse=16 auto-scrolls to verse 16 (scrollY=1610, verse-16 visible near top), verse tap opens gorhom bottom sheet with highlight-yellow/red/green/none + verse-copy + verse-bookmark, highlight persists (yellow), translation switch KJV<->WEB in the same chapter changes text ('came John the Baptist' -> 'John the Baptizer came'), font-increase works, reader-next moves across chapters, search returns real results for 'God so loved' with search-result-John-3-16 opening reader at v16, search-clear and no-results ('zqxzqxzqxq') states both render, saved bookmark appears in Saved tab (bookmark-Matthew-3-* + bookmark-remove-*), Progress tab shows completion-percent + streak-metric + saved-metric, and Home Continue Reading card jumps back to lastRead (John 3:16). No red-screen errors. No deprecated Expo packages detected (expo-av / expo-barcode-scanner / expo-background-fetch not used).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Minor (non-blocking): a benign console warning 'props.pointerEvents is deprecated. Use style.pointerEvents' is emitted by the Toast/AnimatedView. Move pointerEvents=\"none\" into style={{pointerEvents:'none'}} to silence it on RN Web.",
+    "Minor (non-blocking): React 19 dev warning 'Accessing element.ref was removed in React 19' appears when a @gorhom/bottom-sheet ref is read. Comes from the library; safe to ignore, but consider upgrading @gorhom/bottom-sheet when a React 19-compatible release is available."
+  ],
+  "critical_code_review_comments": [
+    "Nothing critical. Code is well-structured: AppContext gates children on `ready` so the wrong-theme flash is impossible; storage.setItem persists dark flag synchronously with state; verse deep-link auto-scroll uses onLayout+scrollTo with a 60ms defer which is reliable on web. reader.tsx (~617 lines) is close to the 700-line soft limit — consider splitting the two BottomSheetModals into subcomponents to keep it maintainable, but not required."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (no backend by design)", "frontend": "100% (14/14 flows)"},
+  "seed_data_creation": "None. App is offline-first; test created transient AsyncStorage entries (bookmarks, highlights, visited, lastRead, dark) during the run.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "App uses Expo Router web preview at EXPO_PUBLIC_BACKEND_URL. Bible JSON is ~4MB per translation and lazy-loaded on first reader/search use; add wait_for_timeout(3000-4000ms) after opening reader or triggering search. testIDs are stable and complete. AsyncStorage persists across page reloads on RN Web (localStorage under the hood), so the theme-persistence test is deterministic. VOTD depends on https://bible-api.com/data/web/random reachability — falls back to cached/parsed value or hardcoded John 3:16.",
+  "rca_of_issue": "N/A — no bugs found."
+}
