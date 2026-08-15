@@ -2,19 +2,23 @@ import { Feather } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import {
+  Keyboard,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/src/context/AppContext';
 import { TOTAL_CHAPTERS } from '@/src/lib/bible';
+import { parseReference } from '@/src/lib/reference';
 import { storage } from '@/src/utils/storage';
 import {
   fonts,
@@ -43,12 +47,13 @@ const FALLBACK: Votd = {
 };
 
 export default function Home() {
-  const { colors, isDark, toggleTheme, lastRead, visited, streak } = useApp();
+  const { colors, isDark, toggleTheme, lastRead, visited, streak, showToast } = useApp();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [votd, setVotd] = useState<Votd | null>(null);
+  const [jump, setJump] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -67,7 +72,6 @@ export default function Home() {
         if (active) setVotd(parsed);
         return;
       }
-      // At most one network call per day.
       try {
         const res = await fetch('https://bible-api.com/data/web/random');
         const json = await res.json();
@@ -100,6 +104,18 @@ export default function Home() {
     });
   };
 
+  const onJump = () => {
+    const ref = parseReference(jump);
+    if (!ref) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      showToast('Couldn’t find that reference', 'alert-circle');
+      return;
+    }
+    Keyboard.dismiss();
+    setJump('');
+    openVerse(ref.book, ref.chapter, ref.verse);
+  };
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.surface }}
@@ -107,6 +123,7 @@ export default function Home() {
         paddingTop: insets.top + spacing.lg,
         paddingBottom: spacing.xxxl,
       }}
+      keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
       testID="home-scroll"
     >
@@ -129,13 +146,33 @@ export default function Home() {
         </Pressable>
       </View>
 
+      {/* Quick Jump */}
+      <View style={styles.jumpWrap}>
+        <Feather name="navigation" size={16} color={colors.onSurfaceTertiary} />
+        <TextInput
+          testID="quick-jump-input"
+          value={jump}
+          onChangeText={setJump}
+          placeholder="Go to a verse — e.g. John 3:16"
+          placeholderTextColor={colors.onSurfaceTertiary}
+          style={styles.jumpInput}
+          autoCorrect={false}
+          autoCapitalize="words"
+          returnKeyType="go"
+          onSubmitEditing={onJump}
+        />
+        {jump.trim().length > 0 && (
+          <Pressable testID="quick-jump-go" onPress={onJump} hitSlop={10}>
+            <Feather name="arrow-right-circle" size={22} color={colors.brand} />
+          </Pressable>
+        )}
+      </View>
+
       {/* Verse of the Day */}
       <Pressable
         testID="votd-card"
         style={styles.hero}
-        onPress={() =>
-          votd && openVerse(votd.book, votd.chapter, votd.verse)
-        }
+        onPress={() => votd && openVerse(votd.book, votd.chapter, votd.verse)}
       >
         <Image
           source={{ uri: isDark ? heroImages.dark : heroImages.light }}
@@ -174,9 +211,7 @@ export default function Home() {
         <Pressable
           testID="continue-reading-card"
           style={styles.continueCard}
-          onPress={() =>
-            openVerse(lastRead.book, lastRead.chapter, lastRead.verse)
-          }
+          onPress={() => openVerse(lastRead.book, lastRead.chapter, lastRead.verse)}
         >
           <View style={styles.continueIcon}>
             <Feather name="book-open" size={18} color={colors.onBrandTertiary} />
@@ -217,18 +252,13 @@ export default function Home() {
           <Text style={styles.statLabel}>Bible Read</Text>
           <View style={styles.progressTrack}>
             <View
-              style={[
-                styles.progressFill,
-                { width: `${Math.max(completion, 2)}%` },
-              ]}
+              style={[styles.progressFill, { width: `${Math.max(completion, 2)}%` }]}
             />
           </View>
         </Pressable>
         <View style={styles.statCard} testID="streak-stat-card">
           <Text style={styles.statValue}>{streak.count}</Text>
-          <Text style={styles.statLabel}>
-            Day Streak{streak.count === 1 ? '' : ''}
-          </Text>
+          <Text style={styles.statLabel}>Day Streak</Text>
           <View style={styles.streakRow}>
             <Feather name="zap" size={13} color={colors.brand} />
             <Text style={styles.streakHint}>
@@ -237,6 +267,24 @@ export default function Home() {
           </View>
         </View>
       </View>
+
+      {/* Learn discovery */}
+      <Pressable
+        testID="home-learn-card"
+        style={styles.learnCard}
+        onPress={() => router.push('/learn')}
+      >
+        <View style={styles.learnIcon}>
+          <Feather name="compass" size={18} color={colors.onBrand} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.learnTitle}>Understand the Bible</Text>
+          <Text style={styles.learnSub}>
+            Guides, book intros & a dictionary
+          </Text>
+        </View>
+        <Feather name="arrow-right" size={20} color={colors.onSurfaceTertiary} />
+      </Pressable>
     </ScrollView>
   );
 }
@@ -255,7 +303,7 @@ const makeStyles = (c: ThemeColors) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: spacing.xl,
-      marginBottom: spacing.xl,
+      marginBottom: spacing.lg,
     },
     greeting: {
       fontFamily: fonts.sans.regular,
@@ -276,6 +324,24 @@ const makeStyles = (c: ThemeColors) =>
       justifyContent: 'center',
       backgroundColor: c.surfaceSecondary,
     },
+    jumpWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginHorizontal: spacing.xl,
+      marginBottom: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      height: 48,
+      borderRadius: radius.pill,
+      backgroundColor: c.surfaceSecondary,
+    },
+    jumpInput: {
+      flex: 1,
+      fontFamily: fonts.sans.regular,
+      fontSize: typeScale.base,
+      color: c.onSurface,
+      padding: 0,
+    },
     hero: {
       marginHorizontal: spacing.xl,
       height: 300,
@@ -284,9 +350,7 @@ const makeStyles = (c: ThemeColors) =>
       justifyContent: 'flex-end',
       backgroundColor: c.surfaceTertiary,
     },
-    heroContent: {
-      padding: spacing.xl,
-    },
+    heroContent: { padding: spacing.xl },
     heroLabel: {
       fontFamily: fonts.sans.semibold,
       fontSize: 11,
@@ -380,5 +444,36 @@ const makeStyles = (c: ThemeColors) =>
       fontFamily: fonts.sans.regular,
       fontSize: typeScale.sm,
       color: c.onSurfaceTertiary,
+    },
+    learnCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      marginHorizontal: spacing.xl,
+      marginTop: spacing.md,
+      padding: spacing.lg,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+    },
+    learnIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: c.brand,
+    },
+    learnTitle: {
+      fontFamily: fonts.serif.medium,
+      fontSize: typeScale.lg,
+      color: c.onSurface,
+    },
+    learnSub: {
+      fontFamily: fonts.sans.regular,
+      fontSize: typeScale.sm,
+      color: c.onSurfaceTertiary,
+      marginTop: 2,
     },
   });

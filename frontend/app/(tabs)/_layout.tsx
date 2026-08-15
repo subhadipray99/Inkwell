@@ -53,6 +53,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="learn"
+        options={{
+          title: 'Learn',
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="compass" size={size - 2} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="search"
         options={{
           title: 'Search',
@@ -67,15 +76,6 @@ export default function TabsLayout() {
           title: 'Saved',
           tabBarIcon: ({ color, size }) => (
             <Feather name="bookmark" size={size - 2} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="progress"
-        options={{
-          title: 'Progress',
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="bar-chart-2" size={size - 2} color={color} />
           ),
         }}
       />

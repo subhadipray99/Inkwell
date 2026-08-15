@@ -6,6 +6,8 @@ import {
 import { Feather } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
+import * as Sharing from 'expo-sharing';
+import { captureRef } from 'react-native-view-shot';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -71,6 +73,8 @@ export default function Reader() {
 
   const verseSheet = useRef<BottomSheetModal>(null);
   const settingsSheet = useRef<BottomSheetModal>(null);
+  const shareSheet = useRef<BottomSheetModal>(null);
+  const cardRef = useRef<View>(null);
   const [selected, setSelected] = useState<{ verse: number; text: string } | null>(null);
 
   const verses = useMemo(() => {
@@ -146,6 +150,28 @@ export default function Reader() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     verseSheet.current?.dismiss();
     showToast(already ? 'Bookmark removed' : 'Verse saved', already ? 'trash-2' : 'bookmark');
+  };
+
+  const openShare = () => {
+    verseSheet.current?.dismiss();
+    setTimeout(() => shareSheet.current?.present(), 260);
+  };
+
+  const doShareImage = async () => {
+    try {
+      const uri = await captureRef(cardRef, {
+        format: 'png',
+        quality: 1,
+        result: 'tmpfile',
+      });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        showToast('Sharing not available here', 'alert-circle');
+      }
+    } catch {
+      showToast('Could not create image', 'alert-circle');
+    }
   };
 
   const renderBackdrop = useCallback(
@@ -325,6 +351,10 @@ export default function Reader() {
                 {selectedBookmarked ? 'Saved' : 'Save'}
               </Text>
             </Pressable>
+            <Pressable testID="verse-share" style={styles.actionBtn} onPress={openShare}>
+              <Feather name="share-2" size={18} color={colors.onSurface} />
+              <Text style={styles.actionText}>Share</Text>
+            </Pressable>
           </View>
         </BottomSheetView>
       </BottomSheetModal>
@@ -405,6 +435,35 @@ export default function Reader() {
               <Text style={[styles.fontBtnText, { fontSize: 26 }]}>A</Text>
             </Pressable>
           </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+
+      {/* Share sheet — renders a verse card and shares it as an image */}
+      <BottomSheetModal
+        ref={shareSheet}
+        enableDynamicSizing
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ backgroundColor: colors.surface }}
+        handleIndicatorStyle={{ backgroundColor: colors.borderStrong }}
+      >
+        <BottomSheetView style={[styles.sheet, { paddingBottom: insets.bottom + spacing.xl }]}>
+          <Text style={styles.sheetSectionLabel}>SHARE THIS VERSE</Text>
+          <View ref={cardRef} collapsable={false} style={styles.shareCard}>
+            <Feather name="feather" size={22} color={colors.brand} />
+            <Text style={styles.shareVerse}>{selected?.text}</Text>
+            <Text style={styles.shareRef}>
+              {loc.book} {loc.chapter}:{selected?.verse}
+            </Text>
+            <View style={styles.shareFooter}>
+              <View style={styles.shareDot} />
+              <Text style={styles.shareBrand}>Logos · {translation}</Text>
+            </View>
+          </View>
+
+          <Pressable testID="share-image-button" style={styles.shareBtn} onPress={doShareImage}>
+            <Feather name="share-2" size={18} color={colors.onBrand} />
+            <Text style={styles.shareBtnText}>Share image</Text>
+          </Pressable>
         </BottomSheetView>
       </BottomSheetModal>
     </View>
@@ -612,5 +671,59 @@ const makeStyles = (c: ThemeColors) =>
       height: 4,
       borderRadius: radius.pill,
       backgroundColor: c.brand,
+    },
+    shareCard: {
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: radius.lg,
+      padding: spacing.xl,
+      marginBottom: spacing.xl,
+    },
+    shareVerse: {
+      fontFamily: fonts.serif.medium,
+      fontSize: 22,
+      lineHeight: 34,
+      color: c.onSurface,
+      marginTop: spacing.lg,
+    },
+    shareRef: {
+      fontFamily: fonts.sans.semibold,
+      fontSize: typeScale.base,
+      color: c.brand,
+      marginTop: spacing.lg,
+    },
+    shareFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginTop: spacing.xl,
+      paddingTop: spacing.lg,
+      borderTopWidth: 1,
+      borderTopColor: c.divider,
+    },
+    shareDot: {
+      width: 8,
+      height: 8,
+      borderRadius: radius.pill,
+      backgroundColor: c.brand,
+    },
+    shareBrand: {
+      fontFamily: fonts.sans.medium,
+      fontSize: typeScale.sm,
+      color: c.onSurfaceTertiary,
+      letterSpacing: 0.5,
+    },
+    shareBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+      paddingVertical: spacing.lg,
+      borderRadius: radius.md,
+      backgroundColor: c.brand,
+    },
+    shareBtnText: {
+      fontFamily: fonts.sans.semibold,
+      fontSize: typeScale.lg,
+      color: c.onBrand,
     },
   });

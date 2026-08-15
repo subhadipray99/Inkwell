@@ -25,7 +25,7 @@ Build a minimal, offline-first Bible reading app. No backend, no database, no au
 7. Dark mode persisted, no flash of wrong theme.
 8. Verse highlighting (yellow/red/green) + copy to clipboard.
 
-## Implemented (2026-06-15)
+## Implemented — v1 (2026-06-15)
 - Full KJV + WEB bundled offline (66/1189/31102 each, verified).
 - Home: VOTD hero (live API + daily cache + fallback), Continue/Start Reading, progress + streak stat cards, theme toggle.
 - Read library with OT/NT toggle; chapter grid with visited highlighting; reader with serif verses, auto-scroll-to-verse, prev/next across book boundaries, translation pill, floating text-size pill.
@@ -38,10 +38,18 @@ Build a minimal, offline-first Bible reading app. No backend, no database, no au
 - Toast confirmations + haptics on save/highlight/copy/tab press.
 - Testing agent: 14/14 flows pass.
 
+## Implemented — v2 (2026-06-15)
+- **Quick Jump**: reference box on Home ("John 3:16", "ps 23", "1 john 2") -> opens passage; invalid input toasts. Parser in `src/lib/reference.ts` with alias map.
+- **Verse Sharing**: reader share sheet renders a styled verse card and exports it via react-native-view-shot + expo-sharing (native share; web renders card only).
+- **Learn tab** (new bottom tab): 5 original explainer articles, introductions to all 66 books (theme/author/date/summary + "Read this book"), and Easton's Bible Dictionary (1897, public domain, 3,963 searchable entries). Data in `src/data/learn.ts` + `src/data/dictionary.json`.
+- **Highlights View**: Saved tab now has Bookmarks | Highlights toggle; highlights listed with colored background, jump, and remove.
+- **Navigation change**: tabs are Home, Read, Learn, Search, Saved; Progress moved to a pushed `/progress` screen from Home's progress card.
+- Testing agent: iteration 2 — all 4 new features + nav change pass 100%.
+
+
 ## Backlog (prioritized)
-- **P1**: Verse-of-the-day share as image; adjustable line-spacing; jump-to-reference quick input.
 - **P2**: Reading plans / daily plan; per-book completion list; audio reading; more translations (ASV/BBE from same repo).
-- **P2**: Bookmark folders/notes; highlights list view; export bookmarks.
+- **P2**: Bookmark folders/notes; export bookmarks; share verse card styling themes; link cross-references in dictionary entries.
 
 ## Next Tasks
-- Await user feedback; consider verse sharing (image/card) and a highlights-only view as next delights.
+- Await user feedback. Candidate delights: reading plans, cross-reference links in the dictionary, and customizable share-card backgrounds.

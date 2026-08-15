@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useApp } from '@/src/context/AppContext';
@@ -16,6 +17,7 @@ import {
 export default function Progress() {
   const { colors, visited, streak, bookmarks } = useApp();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const visitedSet = useMemo(() => new Set(visited), [visited]);
@@ -41,6 +43,16 @@ export default function Progress() {
       }}
       showsVerticalScrollIndicator={false}
     >
+      <View style={styles.headerRow}>
+        <Pressable
+          testID="progress-back"
+          onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.backBtn}
+        >
+          <Feather name="chevron-left" size={24} color={colors.onSurface} />
+        </Pressable>
+      </View>
       <Text style={styles.title}>Progress</Text>
 
       {/* Completion hero */}
@@ -138,6 +150,16 @@ function TestamentStat({
 
 const makeStyles = (c: ThemeColors) =>
   StyleSheet.create({
+    headerRow: {
+      marginBottom: spacing.sm,
+    },
+    backBtn: {
+      width: 40,
+      height: 40,
+      marginLeft: -spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     title: {
       fontFamily: fonts.serif.semibold,
       fontSize: typeScale.xxxl,

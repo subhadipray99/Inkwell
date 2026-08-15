@@ -1,0 +1,27 @@
+{
+  "summary": "Iteration 2 tested the 4 new features + navigation change on the offline-first Logos Bible app (Expo web preview, mobile 390x844). All flows pass end-to-end. (1) Quick Jump on Home: 'John 3:16' navigates to /reader?book=John&chapter=3&verse=16; 'ps 23' resolves to Psalms 23; '1 john 2' resolves to 1 John 2; invalid 'zzzz' shows a toast and stays on Home (no navigation). (2) home-learn-card correctly opens the Learn tab (learn-scroll). (3) Learn tab renders learn-intros, learn-dictionary, and the GUIDES list including learn-article-what-is-the-bible which opens an article with body text and returns via article-back. (4) Book Introductions: intros-testament-OT/NT toggle filters; NT + intro-row-John opens /learn/book showing theme ('Jesus the Son of God'), summary, and facts (Author: Traditionally John, Written: c. AD 90, Chapters: 21); book-intro-read navigates to /chapters?book=John. (5) Bible Dictionary: dictionary-input debounced search for 'faith' surfaces dict-term-Faith, tapping it opens /learn/term with the full Easton's definition; dictionary-clear resets the input. (6) Verse Sharing in reader: verse-16 action sheet exposes verse-copy, verse-bookmark, verse-share; verse-share opens a share sheet showing the verse card (verse text + 'John 3:16' + 'Logos · KJV') and share-image-button — meets the on-web success criterion. (7) Highlights View in Saved: saved-tab-bookmarks/saved-tab-highlights segmented control works; after highlighting verse 16 yellow, highlight-item-John-3-16 shows with yellow-tinted verse text; tapping the item opens /reader at John 3:16; highlight-remove-John-3-16 deletes it and highlights-empty renders. (8) Home progress-stat-card pushes /progress (completion-percent shown), and progress-back returns to Home. (9) Regression: VOTD renders live (e.g. 'Ecclesiastes 3:7'), translation switch (reader-settings-pill -> translation-WEB) works, and the new bottom tabs (Home / Read / Learn / Search / Saved) are all present and functional. No red-screen errors. No new deprecated Expo packages introduced (no expo-av, expo-barcode-scanner, or expo-background-fetch).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Non-blocking (carryover from iteration 1): 'props.pointerEvents is deprecated. Use style.pointerEvents' warning still emitted by the Toast animated view — move pointerEvents=\"none\" into style={{ pointerEvents: 'none' }} for RN Web cleanliness.",
+    "Non-blocking (carryover): 'Accessing element.ref was removed in React 19' dev warning from @gorhom/bottom-sheet ref access. Library-level, safe to ignore for now."
+  ],
+  "critical_code_review_comments": [
+    "reader.tsx is now ~650+ lines and contains three BottomSheetModals (actions, settings, share). Consider extracting ShareSheet and ActionSheet into subcomponents to stay under the 700-line soft limit.",
+    "learn/dictionary.tsx uses a 180ms debounce which is fine on the 2.5MB dictionary; on first open the first search may lag slightly while the JSON is parsed lazily — acceptable, but a small spinner while results are pending would improve perceived responsiveness.",
+    "reference parser correctly handles 'ps 23', '1 john 2', 'John 3:16'; defaults verse to 1 when omitted — behavior matches spec."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (no backend by design)", "frontend": "100% (all 10 requested scenarios + regression flows)"},
+  "seed_data_creation": "None. Test created transient AsyncStorage entries (highlight on John 3:16 yellow, then removed) during the run.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All testIDs in the request are present and stable. Dictionary + Bible JSON parse lazily — add 1500-2000ms after opening dictionary/reader on first hit. Share image capture via react-native-view-shot no-ops on web, but the share sheet and share-image-button render correctly which is the expected on-web behavior. Bottom tabs order: Home, Read, Learn, Search, Saved. Progress is no longer a tab — reach it via home progress-stat-card -> /progress -> progress-back returns to Home.",
+  "rca_of_issue": "N/A — no bugs found."
+}
