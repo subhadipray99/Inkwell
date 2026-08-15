@@ -18,7 +18,10 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.emergent.versedaily.zlv028"
+      "package": "com.emergent.versedaily.zlv028",
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -53,12 +56,20 @@
       [
         "expo-build-properties",
         {
-          "ios": { "useFrameworks": "static" }
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "029f78e3-03e3-45b7-998f-5b8d78fc82e6"
+      }
     }
   }
 }
