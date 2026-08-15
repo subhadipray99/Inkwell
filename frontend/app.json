@@ -54,13 +54,16 @@
         }
       ],
       [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ]
+  "expo-build-properties",
+  {
+    "ios": {
+      "useFrameworks": "static"
+    },
+    "android": {
+      "kotlinVersion": "2.0.0"
+    }
+  }
+]
     ],
     "experiments": {
       "typedRoutes": true
